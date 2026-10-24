@@ -104,18 +104,7 @@ dependencies {
     // For all intends and purposes: You can treat this dependency as if it is a normal library you would use.
     implementation "net.neoforged:neoforge:${neo_version}"
 
-    // ---- KasugaLib Next (mod id: kasuga_lib) ----
-    // 来源：本机 D:\HuaweiMoveData\Users\11\Desktop\KasugaLibNext-master\KasugaLibNext-master
-    //      构建命令 ./gradlew :modules:library:shadowJar
-    //      产物   modules/library/build/libs/kasuga-library-<版本>-all.jar
-    // 必须用带 "-all" 的包（约 8MB）：它内含 core/create/scripting/modelling 等全部子模块
-    // 以及加壳的 micronaut 等第三方库；不带 -all 的那个只有 36KB 骨架，编译能过、运行必崩。
-    // 升级 KasugaLibNext 后：重新构建 -> 新 jar 覆盖到 libs/ -> 改下面这行的版本号。
     implementation files('libs/kasuga-library-1.0.0-all.jar')
-
-    // 如果以后 KasugaLibNext 发布到了 maven（如 https://maven.kycraft.cn/snapshots），
-    // 把上面一行换成远程坐标，并在 repositories {} 里加对应 maven 地址即可，例如：
-    // implementation "kasuga.lib:kasuga_lib-${minecraft_version}-create:<版本>"
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -145,7 +134,6 @@ dependencies {
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
 // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
 tasks.withType(ProcessResources).configureEach {
-    // 显式用 UTF-8 过滤，否则 neoforge.mods.toml 里的非 ASCII 字符在新版 Gradle 上会被写坏
     filteringCharset = 'UTF-8'
     var replaceProperties = [
             minecraft_version      : minecraft_version,

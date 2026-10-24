@@ -31,12 +31,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-### Windows ###
-Thumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-### Minecraft Modding (NeoGradle) ###
+### Minecraft Modding ###
 run/
 run-*/
 !**/src/**/run/
@@ -44,15 +39,13 @@ run-*/
 repo/
 !**/src/**/repo/
 
-### Logs / crash reports / heap dumps ###
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
 *.log
 logs/
 crash-reports/
 hs_err_pid*
 replay_pid*
 *.hprof
-
-### Local test jars ###
-# 第三方 mod 的 jar 一般放在 run/<name>/mods 下，已被上面的 run/ 忽略；
-# 如果你改放到工程根目录的 mods/ 里，取消下一行注释
-# mods/
