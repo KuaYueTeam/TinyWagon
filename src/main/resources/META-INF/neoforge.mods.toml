@@ -79,6 +79,16 @@ Example mod description.
     # Side this dependency is applied on - BOTH, CLIENT, or SERVER
     side="BOTH"
 
+# KasugaLib Next (kasuga_lib): compile-time jar is libs/kasuga-library-*-all.jar,
+# the same mod must also be installed alongside this mod at runtime.
+# Change type to "optional" if you do not want a hard dependency.
+[[dependencies.${mod_id}]]
+    modId="kasuga_lib"
+    type="required"
+    versionRange="[1.0.0,)"
+    ordering="AFTER"
+    side="BOTH"
+
 # Here's another dependency
 [[dependencies.${mod_id}]]
     modId="minecraft"
