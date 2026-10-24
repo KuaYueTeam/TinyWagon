@@ -1,0 +1,13 @@
+# Disable autocrlf on generated files, they always generate with LF
+# Add any extra files or paths here to make git stop saying they
+# are changed when only line endings change.
+src/generated/**/.cache/* text eol=lf
+src/generated/**/*.json text eol=lf
+
+# gradlew 必须保持 LF，否则 GitHub Actions 在 Linux 上执行 ./gradlew 会失败
+gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# jar 按二进制处理，不做换行/diff 转换
+*.jar binary

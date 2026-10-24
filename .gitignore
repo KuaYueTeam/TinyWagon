@@ -1,0 +1,58 @@
+### Gradle ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/**/out/
+.run/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.eclipse/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/**/bin/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Windows ###
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+### Minecraft Modding (NeoGradle) ###
+run/
+run-*/
+!**/src/**/run/
+**/src/generated/**/.cache/
+repo/
+!**/src/**/repo/
+
+### Logs / crash reports / heap dumps ###
+*.log
+logs/
+crash-reports/
+hs_err_pid*
+replay_pid*
+*.hprof
+
+### Local test jars ###
+# 第三方 mod 的 jar 一般放在 run/<name>/mods 下，已被上面的 run/ 忽略；
+# 如果你改放到工程根目录的 mods/ 里，取消下一行注释
+# mods/

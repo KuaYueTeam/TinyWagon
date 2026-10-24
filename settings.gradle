@@ -1,0 +1,15 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.neoforged.net/releases' }
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+// 保持与旧工程一致的根项目名：决定 IDEA 生成的模块名
+// 与运行配置前缀(TinyWagon: Client 等)。
+// 不影响 jar 名与 mod 元数据——那些由 build.gradle 的 archivesName = mod_id 与 gradle.properties 的 mod_id/mod_name 决定。
+rootProject.name = 'TinyWagon'
