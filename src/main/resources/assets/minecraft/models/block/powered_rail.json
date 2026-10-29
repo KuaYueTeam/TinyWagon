@@ -2,7 +2,7 @@
 	"format_version": "26.3",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"1": "block/rail_power/powered_rail_on",
+		"1": "block/powered_rail",
 		"4": "block/rail_power/wrap_gold",
 		"5": "block/rail_power/wire",
 		"particle": "minecraft:block/powered_rail"
