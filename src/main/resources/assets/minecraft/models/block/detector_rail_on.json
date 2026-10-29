@@ -5,7 +5,7 @@
     "2": "block/rail",
     "3": "block/rail_detect/button",
     "6": "block/rail_detect/wire_detect_on",
-    "particle": "minecraft:block/detectored_rail_on"
+    "particle": "minecraft:block/detected_rail_on"
   },
   "elements": [
     {

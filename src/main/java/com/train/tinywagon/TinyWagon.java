@@ -1,5 +1,6 @@
 package com.train.tinywagon;
 
+//import com.train.tinywagon.items.BufferStop;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -28,6 +29,8 @@ public class TinyWagon {
     public TinyWagon(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+//        BufferStop.register(modEventBus);
+//        NeoForge.EVENT_BUS.register(this);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (TinyWagon) to respond directly to events.
