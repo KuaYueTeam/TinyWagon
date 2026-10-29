@@ -1,7 +1,8 @@
-newmtl m_1937ad57-11b8-e9aa-7efa-c0f6c1a65ea1
-map_Kd #texture1
+# Made in Blockbench 5.2.2
 newmtl m_3be31db3-81a9-4905-0eb6-4dcc91a3ca5f
 map_Kd #texture2
+newmtl m_1937ad57-11b8-e9aa-7efa-c0f6c1a65ea1
+map_Kd #texture1
 newmtl m_6c648747-6c4f-6e1c-d610-000dd63d4d91
 map_Kd #texture0
 newmtl none

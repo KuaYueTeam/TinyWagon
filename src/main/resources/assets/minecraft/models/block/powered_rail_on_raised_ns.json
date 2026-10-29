@@ -3,7 +3,7 @@
   "model": "minecraft:models/block/powered_rail_raised/ns/powered_rail.obj",
   "mtl_override": "minecraft:models/block/powered_rail_raised/ns/powered_rail.mtl",
   "textures": {
-    "texture0": "minecraft:block/rail",
+    "texture0": "minecraft:block/rail_power/powered_rail_on",
     "texture1": "minecraft:block/rail_power/wrap_gold",
     "texture2": "minecraft:block/rail_power/wire_on",
     "particle": "minecraft:block/powered_rail_on"
