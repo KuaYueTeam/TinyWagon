@@ -1,0 +1,15 @@
+{
+  "loader": "neoforge:obj",
+  "model": "minecraft:models/block/powered_rail_raised/ns/powered_rail.obj",
+  "mtl_override": "minecraft:models/block/powered_rail_raised/ns/powered_rail.mtl",
+  "textures": {
+    "texture0": "minecraft:block/rail",
+    "texture1": "minecraft:block/rail_power/wrap_gold",
+    "texture2": "minecraft:block/rail_power/wire_on",
+    "particle": "minecraft:block/powered_rail_on"
+  },
+  "automatic_culling": true,
+  "shade_quads": true,
+  "flip_v": true,
+  "emissive_ambient": false
+}

@@ -1,0 +1,14 @@
+{
+  "loader": "neoforge:obj",
+  "model": "minecraft:models/block/activator_rail_raised/ns/rail_activate_on.obj",
+  "mtl_override": "minecraft:models/block/activator_rail_raised/ns/rail_activate_on.mtl",
+  "textures": {
+    "texture0": "minecraft:block/rail",
+    "texture2": "minecraft:block/rail_activator/wire_activate_on",
+    "particle": "minecraft:block/activator_rail"
+  },
+  "automatic_culling": true,
+  "shade_quads": true,
+  "flip_v": true,
+  "emissive_ambient": false
+}
