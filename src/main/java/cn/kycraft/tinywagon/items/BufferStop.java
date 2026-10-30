@@ -1,6 +1,6 @@
-//package com.train.tinywagon.items;
+//package cn.kycraft.tinywagon.items;
 //
-//import com.train.tinywagon.TinyWagon;
+//import cn.kycraft.tinywagon.TinyWagon;
 //import net.minecraft.world.item.Item;
 //import net.neoforged.bus.api.IEventBus;
 //import net.neoforged.neoforge.registries.DeferredItem;

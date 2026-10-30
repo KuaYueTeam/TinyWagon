@@ -1,6 +1,6 @@
 package cn.kycraft.tinywagon;
 
-//import com.train.tinywagon.items.BufferStop;
+//import cn.kycraft.tinywagon.items.BufferStop;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -29,7 +29,7 @@ public class TinyWagon {
     public TinyWagon(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
-//        BufferStop.register(modEventBus);
+//        cn.kycraft.tinywagon.items.BufferStop.register(modEventBus);
 //        NeoForge.EVENT_BUS.register(this);
 
         // Register ourselves for server and other game events we are interested in.

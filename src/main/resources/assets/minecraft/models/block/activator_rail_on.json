@@ -2,7 +2,7 @@
 	"format_version": "26.3",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "tiny_wagon:block/rail/rail",
+		"0": "block/rail",
 		"2": "tiny_wagon:block/rail/rail_activator/wire_activate_on",
 		"particle": "minecraft:block/activator_rail_on"
 	},

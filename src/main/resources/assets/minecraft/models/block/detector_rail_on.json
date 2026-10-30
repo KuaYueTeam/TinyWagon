@@ -2,7 +2,7 @@
   "format_version": "26.3",
   "credit": "Made with Blockbench",
   "textures": {
-    "2": "tiny_wagon:block/rail/rail",
+    "2": "block/rail",
     "3": "tiny_wagon:block/rail/rail_detect/button",
     "6": "tiny_wagon:block/rail/rail_detect/wire_detect_on",
     "particle": "minecraft:block/detector_rail_on"

@@ -3,7 +3,7 @@
 	"format_version": "26.3",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "tiny_wagon:block/rail/rail",
+		"0": "block/rail",
 		"particle": "minecraft:block/rail"
 	},
 	"elements": [

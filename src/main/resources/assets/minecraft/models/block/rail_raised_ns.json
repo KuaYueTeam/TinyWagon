@@ -3,7 +3,7 @@
   "model": "tiny_wagon:models/block/rail/rail_raised/ns/rail.obj",
   "mtl_override": "tiny_wagon:models/block/rail/rail_raised/ns/rail.mtl",
   "textures": {
-    "texture0": "tiny_wagon:block/rail/rail",
+    "texture0": "block/rail",
     "particle": "tiny_wagon:block/rail/rail"
   },
   "automatic_culling": true,
