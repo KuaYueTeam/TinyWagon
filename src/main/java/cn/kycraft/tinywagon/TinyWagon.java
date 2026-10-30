@@ -1,4 +1,4 @@
-package com.train.tinywagon;
+package cn.kycraft.tinywagon;
 
 //import com.train.tinywagon.items.BufferStop;
 import org.slf4j.Logger;

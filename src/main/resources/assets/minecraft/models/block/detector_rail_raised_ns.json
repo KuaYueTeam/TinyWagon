@@ -1,11 +1,11 @@
 {
   "loader": "neoforge:obj",
-  "model": "minecraft:models/block/detector_rail_raised/ns/detector_rail.obj",
-  "mtl_override": "minecraft:models/block/detector_rail_raised/ns/detector_rail.mtl",
+  "model": "tiny_wagon:models/block/rail/detector_rail_raised/ns/detector_rail.obj",
+  "mtl_override": "tiny_wagon:models/block/rail/detector_rail_raised/ns/detector_rail.mtl",
   "textures": {
-    "texture0": "minecraft:block/rail",
-    "texture1": "minecraft:block/rail_detect/button",
-    "texture2": "minecraft:block/rail_detect/wire_detect",
+    "texture0": "tiny_wagon:block/rail/rail",
+    "texture1": "tiny_wagon:block/rail/rail_detect/button",
+    "texture2": "tiny_wagon:block/rail/rail_detect/wire_detect",
     "particle": "minecraft:block/detector_rail"
   },
   "automatic_culling": true,

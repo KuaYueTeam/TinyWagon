@@ -1,10 +1,10 @@
 {
   "loader": "neoforge:obj",
-  "model": "minecraft:models/block/activator_rail_raised/ns/rail_activate.obj",
-  "mtl_override": "minecraft:models/block/activator_rail_raised/ns/rail_activate.mtl",
+  "model": "tiny_wagon:models/block/rail/activator_rail_raised/ns/rail_activate.obj",
+  "mtl_override": "tiny_wagon:models/block/rail/activator_rail_raised/ns/rail_activate.mtl",
   "textures": {
-    "texture0": "minecraft:block/rail",
-    "texture1": "minecraft:block/rail_activator/wire_activate",
+    "texture0": "tiny_wagon:block/rail/rail",
+    "texture1": "tiny_wagon:block/rail/rail_activator/wire_activate",
     "particle": "minecraft:block/activator_rail"
   },
   "automatic_culling": true,

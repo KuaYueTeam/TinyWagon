@@ -1,4 +1,4 @@
-package com.train.tinywagon;
+package cn.kycraft.tinywagon;
 
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;

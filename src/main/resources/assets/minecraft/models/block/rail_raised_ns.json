@@ -1,10 +1,10 @@
 {
   "loader": "neoforge:obj",
-  "model": "minecraft:models/block/rail_raised/ns/rail.obj",
-  "mtl_override": "minecraft:models/block/rail_raised/ns/rail.mtl",
+  "model": "tiny_wagon:models/block/rail/rail_raised/ns/rail.obj",
+  "mtl_override": "tiny_wagon:models/block/rail/rail_raised/ns/rail.mtl",
   "textures": {
-    "texture0": "minecraft:block/rail",
-    "particle": "minecraft:block/rail"
+    "texture0": "tiny_wagon:block/rail/rail",
+    "particle": "tiny_wagon:block/rail/rail"
   },
   "automatic_culling": true,
   "shade_quads": true,

@@ -1,11 +1,11 @@
 {
   "loader": "neoforge:obj",
-  "model": "minecraft:models/block/powered_rail_raised/ns/powered_rail.obj",
-  "mtl_override": "minecraft:models/block/powered_rail_raised/ns/powered_rail.mtl",
+  "model": "tiny_wagon:models/block/rail/powered_rail_raised/ns/powered_rail.obj",
+  "mtl_override": "tiny_wagon:models/block/rail/powered_rail_raised/ns/powered_rail.mtl",
   "textures": {
-    "texture0": "minecraft:block/powered_rail_on",
-    "texture1": "minecraft:block/rail_power/wrap_gold",
-    "texture2": "minecraft:block/rail_power/wire_on",
+    "texture0": "block/powered_rail_on",
+    "texture1": "tiny_wagon:block/rail/rail_power/wrap_gold",
+    "texture2": "tiny_wagon:block/rail/rail_power/wire_on",
     "particle": "minecraft:block/powered_rail_on"
   },
   "automatic_culling": true,

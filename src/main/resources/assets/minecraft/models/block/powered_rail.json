@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"textures": {
 		"1": "block/powered_rail",
-		"4": "block/rail_power/wrap_gold",
-		"5": "block/rail_power/wire",
+		"4": "tiny_wagon:block/rail/rail_power/wrap_gold",
+		"5": "tiny_wagon:block/rail/rail_power/wire",
 		"particle": "minecraft:block/powered_rail"
 	},
 	"elements": [

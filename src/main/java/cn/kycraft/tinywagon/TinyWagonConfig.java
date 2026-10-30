@@ -1,4 +1,4 @@
-package com.train.tinywagon;
+package cn.kycraft.tinywagon;
 
 import java.util.List;
 
