@@ -1,5 +1,4 @@
 //package cn.kycraft.tinywagon.items;
-//
 //import cn.kycraft.tinywagon.TinyWagon;
 //import net.minecraft.world.item.Item;
 //import net.neoforged.bus.api.IEventBus;

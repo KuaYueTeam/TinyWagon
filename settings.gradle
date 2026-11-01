@@ -13,3 +13,6 @@ plugins {
 // 与运行配置前缀(TinyWagon: Client 等)。
 // 不影响 jar 名与 mod 元数据——那些由 build.gradle 的 archivesName = mod_id 与 gradle.properties 的 mod_id/mod_name 决定。
 rootProject.name = 'TinyWagon'
+
+include ':modules:core'
+include ':modules:resources'

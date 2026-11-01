@@ -52,6 +52,24 @@ replay_pid*
 .dsh/
 .scratch/
 .api-analysis
-.docs
+.docs/
+.gradle/configuration-cache/
 
+run/
+run-*/
+**/run/
+**/run-*/
 
+**/.neoforged/
+**/neoForm/
+
+*.iml
+*.ipr
+*.iws
+out/
+
+*.log.gz
+debug.log
+
+src/generated/
+!**/src/generated/README.md

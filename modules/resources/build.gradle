@@ -1,0 +1,25 @@
+//plugins {
+//    id 'java-library'
+//}
+//
+//version = mod_version
+//group = mod_group_id
+//base { archivesName = "${mod_id}-resources" }
+//
+//java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+//
+//sourceSets {
+//    main {
+//        resources {
+//            srcDir project(':modules:resources').file('src/resources')
+//        }
+//    }
+//}
+//
+//dependencies {
+//    implementation project(':modules:resources')
+//}
+//
+//tasks.named('jar') {
+//    from(project(':modules:resources').sourceSets.main.output.resourcesDir)
+//}
