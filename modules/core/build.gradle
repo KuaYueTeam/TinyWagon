@@ -1,0 +1,254 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.107'
+    // KasugaLibNext/modules/gradle-plugin 提供（本仓库 settings.gradle 与 KasugaLibNext/settings.gradle
+    // 都把它 includeBuild 进来了，所以两种构建入口都能解析到）。
+    // 它给 project.ext 装上 useModProject 闭包——只在 isKasugaMonorepo 时才真正调用。
+    id 'builder.kasuga.monorepo'
+    id 'idea'
+}
+
+// 判断当前是否处在 KasugaLibNext 的构建里。
+//
+// 本项目有两种构建入口，两种都必须能跑：
+//   1) 独立构建：cd TinyWagon && gradle ...            → 没有 :modules:library 这个工程
+//   2) 并入 KasugaLibNext：cd KasugaLibNext && gradle ... → 有 :modules:library，且由它提供 kasuga_lib
+//
+// 为什么要区分：kasuga_lib 在运行期不是 jar，而是 KasugaMonorepoPlugin.useModProject() 挂上去的
+// 一堆 sourceSet（modules/gradle-plugin/.../KasugaMonorepoPlugin.groovy:82-117，对 library 只声明
+// compileOnly）。所以在构建 2 里必须走 useModProject，让子模块的类真正进入运行期 classpath；
+// 在构建 1 里只能退回字符坐标 + composite replacement，编译期够用，运行期缺类（已知限制）。
+def isKasugaMonorepo = gradle.rootProject.findProject(':modules:library') != null
+
+// ⚠️ gradle.properties 是「每棵构建树一份」的，Gradle 不会为跨目录的子项目自动加载另一个仓库的。
+// 在构建 2 里，本工程读到的会是 KasugaLibNext/gradle.properties（mod_id=kasuga_lib, neo_version=21.1.203），
+// 于是 tiny_wagon 的 mod_id / mod_name / 版本 / 作者全被 kasuga_lib 的值顶掉，
+// 表现为 `gradle -q :tinywagon-core:properties | grep mod_name` 输出 "KasugaLib Next"，
+// 进而 generateModMetadata 用错 mod_id，mod 内容挂不上、运行期一堆 ClassNotFoundException。
+//
+// 所以这里把 TinyWagon 自己的 gradle.properties 显式读进来覆盖到 project.ext。
+// 路径用绝对定位（本文件在 TinyWagon/modules/core 下 → 上溯两级就是 TinyWagon/），
+// 不依赖 Gradle 的默认查找行为。
+if (isKasugaMonorepo) {
+    def tinyWagonProps = new Properties()
+    def tinyWagonPropsFile = file("${rootDir}/../TinyWagon/gradle.properties")
+    if (!tinyWagonPropsFile.exists()) {
+        // 独立构建时不需要这段（那时 Gradle 本来就找得到 TinyWagon/gradle.properties）；
+        // 构建 2 里找不到就说明目录布局变了，明确报错比静默用错 mod_id 好得多。
+        throw new GradleException(
+                "找不到 ${tinyWagonPropsFile}。并入 KasugaLibNext 构建时，TinyWagon 必须位于" +
+                " KasugaLibNext 的同级目录（KasugaLibNext/settings.gradle 里用 ../TinyWagon 引用）。")
+    }
+    tinyWagonPropsFile.withInputStream { tinyWagonProps.load(it) }
+    // 只覆盖本 mod 自己的标识类属性；不要把 minecraft_version/neo_version 带进来，
+    // 那些必须跟随宿主 KasugaLibNext，否则同一棵树里两个 NeoForge 版本会冲突。
+    ['mod_id', 'mod_name', 'mod_license', 'mod_version', 'mod_group_id',
+     'mod_authors', 'mod_description'].each { key ->
+        if (tinyWagonProps.getProperty(key) != null) {
+            project.ext.set(key, tinyWagonProps.getProperty(key))
+        }
+    }
+    // neoforge.mods.toml 里声明的 kasuga_lib 依赖版本区间由宿主提供
+    def kasugaLibVersion = gradle.rootProject.findProperty('mod_version')
+    if (kasugaLibVersion == null) {
+        throw new GradleException("宿主 KasugaLibNext 没有 mod_version 属性，无法生成 kasugaLibVersionRange")
+    }
+    project.ext.set('kasugaLibVersionRange', "[${kasugaLibVersion},)")
+    logger.lifecycle("[tinywagon] 已从 ${tinyWagonPropsFile} 载入 mod 标识：" +
+            "mod_id=${project.ext.mod_id}, mod_version=${project.ext.mod_version}")
+}
+
+version = mod_version
+group = mod_group_id
+base { archivesName = mod_id }
+
+// KasugaLibNext 传递依赖需要的仓库。
+//
+// 为什么必须写在**这里**（project 级）而不是 settings.gradle：
+//   1. Gradle 的 repositories 只对声明它的 project 生效，跨不过 composite build 边界。
+//      KasugaLibNext :modules:library 上的 api 依赖（Create/Ponder/Flywheel/Registrate/CC-Tweaked）
+//      会传递到本项目的 runtimeClasspath，但解析用的是**本项目**的仓库列表，
+//      KasugaLibNext 自己 build.gradle 里声明的仓库完全帮不上忙。缺了它们会报
+//      "Could not resolve all dependencies for configuration ':modules:core:runtimeClasspath'"。
+//   2. 不能改到 settings.gradle 的 dependencyResolutionManagement：那会让 moddev
+//      跳过自带仓库插件，丢掉 mojang-meta（minecraft-dependencies 只在那儿）。
+//      详细因果见 settings.gradle 顶部注释。
+//
+// 地址与 KasugaLibNext/modules/library/build.gradle:15-25 保持一致，改那边时同步这里。
+// 这里只**追加**，moddev 自带的 Mojang/NeoForge/Central 仓库不受影响。
+repositories {
+    maven { url = 'https://maven.createmod.net' }           // Create, Ponder, Flywheel
+    maven { url = 'https://maven.ithundxr.dev/snapshots' }  // Registrate
+    maven {
+        url = 'https://maven.squiddev.cc'
+        content { includeGroup('cc.tweaked') }
+    }
+}
+
+
+sourceSets {
+    main {
+        resources {
+            // 路径必须随构建入口切换：
+            //   独立构建时 sourceSets 在 TinyWagon/modules/core 下，:modules:track 就是同级目录；
+            //   并入 KasugaLibNext 后本项目重命名为 :tinywagon-core，:modules:track 指向的是 KasugaLibNext
+            //   自己的 modules/track（那是它的资源模块，与本项目无关），所以要走 :tinywagon-track。
+            srcDir project(isKasugaMonorepo ? ':tinywagon-track' : ':modules:track').file('src/resources')
+        }
+    }
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion  = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        client  { client();   systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id }
+        server  { server();   programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id }
+        gameTestServer { type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id }
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                    '--output',  file('src/generated/resources/').getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    // 注意：这里**不写** mods{}。全项目 mods 的注册统一放在文件末尾的
+    // 「MODS 注册」小节，原因见那里的注释（ordering 问题）。
+}
+
+// ===== 与 KasugaLibNext（composite 宿主）对接 =====
+// 目标：TinyWagon 以普通 mod 的身份运行，kasuga_lib 以**独立 mod 文件**的身份运行。
+//
+// 走过的弯路（每一条都实测失败过，别再回头试）：
+//  A. useModProject(project(:modules:library))  → 只搬 library 自己一层 sourceSet，
+//     它的 7 个子模块不跟过来 → ClassNotFoundException: lib.kasuga.mixins.KasugaLibMixinPlugin
+//  B. useModProject 逐个调 16 个子模块      → mixin 全齐了，但 16 个模块的 sourceSet 全被
+//     塞进 tiny_wagon 的 mod，kasuga_lib 反而不出现：
+//     Actual version: '[MISSING]' / Currently, kasuga_lib is not installed
+//     而且 useModProject 还会把子模块的 resources srcDirs 追加进 main，
+//     把 tiny_wagon 的 entrypoint 顶到 KasugaLibNext/modules/library/build/resources/main，
+//     报 fml.modloadingissue.javafml.dangling_entrypoint
+//  C. additionalRuntimeClasspath 带 16 个子模块 jar → 16 个 jar 都进了 legacyClasspath，
+//     但 moddev 的 mod 文件夹只来自 neoForge.mods{} 的源集输出（RunUtils.buildModFolders），
+//     classpath 上的 jar 不会被当成 mod → 仍然 '[MISSING]'
+//
+// 最终方案：kasuga_lib 只由 library 的 shadowJar（classifier=all，8.2 MB，内含 69 个
+// lib.kasuga.mixins.* 类）单独承载，作为**一个** jar 放进运行期；TinyWagon 只用
+// neoForge.mods 注册自己。编译期靠 compileOnly 那 16 个工程拿到 lib.kasuga.* 的符号。
+def kasugaModules = [':modules:library', ':modules:utils', ':modules:formula', ':modules:core',
+                     ':modules:data-driven', ':modules:inject', ':modules:create',
+                     ':modules:scripting', ':modules:modelling', ':modules:generator',
+                     ':modules:multiversion', ':modules:annotations', ':modules:resource-compiler',
+                     ':modules:shader', ':modules:render-core', ':modules:render-opengl']
+if (isKasugaMonorepo) {
+    // 保证子工程先评估，下面 mods{} / 依赖才拿得到它们的输出
+    for (def p in kasugaModules) {
+        evaluationDependsOn(p)
+    }
+}
+
+// kasuga_lib 的运行期载体：library 的 shadowJar 产物（classifier=all）。
+// 版本号取自 KasugaLibNext 的 mod_version，与 -all.jar 文件名保持一致。
+def kasuga_lib_version = isKasugaMonorepo ? project(':modules:library').version : '1.0.0'
+def kasugaLibAllJar = isKasugaMonorepo
+        ? project(':modules:library').layout.buildDirectory.file("libs/kasuga-library-${kasuga_lib_version}-all.jar").get().asFile
+        : null
+
+// ===== MODS 注册 =====
+// 只注册 TinyWagon 自己。kasuga_lib 不在这里注册——它以 library 的 -all.jar 形态
+// 作为独立的 mod 文件被 FML 发现（见下面 dependencies{} 的 localRuntime）。
+neoForge {
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    // 让 localRuntime 里的东西进入运行期 classpath。
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    // moddev 2.x 通过 neoForge.version 引入 Minecraft/NeoForge，不再声明 "net.neoforged:neoforge:<ver>"。
+    // 显式写同一版本会解析到不存在的 "21.1.235-<version>.jar"，报 Missing artifact。
+    // implementation "net.neoforged:neoforge:${neo_version}"
+
+    if (isKasugaMonorepo) {
+        // 构建入口 2（cd KasugaLibNext && gradle :tinywagon-core:...）
+        //
+        // 编译期：16 个 kasuga 子模块全部 compileOnly，TinyWagon 才能 import lib.kasuga.*。
+        //        只 compileOnly、不进运行时 classpath——它们的类由下面的 -all.jar 提供。
+        for (def p in kasugaModules) {
+            compileOnly project(p)
+        }
+        // 运行期：kasuga_lib 以 library 的 shadowJar（classifier=all）**单个 jar** 的形态
+        // 进入运行期。放进 localRuntime 即可：
+        //   runtimeClasspath.extendsFrom localRuntime 会把它带上 classpath；
+        //   moddev 的 RunUtils.buildModFolders 再把这个 jar 当 mod 文件扫描，
+        //   它自带 lib.kasuga.mixins.*（69 个类）+ kasuga_lib.mixins.json + neoforge.mods.toml，
+        //   于是 Mod List 里出现 "KasugaLib Next 1.0.0 (kasuga_lib)"，而 tiny_wagon 只有自己。
+        //
+        // 为什么不能写成 additionalRuntimeClasspath：那样 jar 只进 legacyClasspath，
+        //   moddev 不把它当 mod → Mod tiny_wagon requires kasuga_lib / Actual version: '[MISSING]'。
+        // 为什么不能换成 16 个 project(...)：16 份同 modId 的元数据互相冲突，
+        //   最终 kasuga_lib 反而不出现（is not installed）。
+        localRuntime files(kasugaLibAllJar)
+
+        // -all.jar 是构建产物，跑之前必须先把它打出来（否则首次运行会拿到过期/缺失的 jar）。
+        def shadowJarTask = project(':modules:library').tasks.named('shadowJar')
+        tasks.withType(JavaExec).configureEach { dependsOn shadowJarTask }
+    } else {
+        // 构建入口 1（cd TinyWagon && gradle ...）：独立构建，只能靠字符坐标。
+        // settings.gradle 的 dependencySubstitution 会把它换成 :KasugaLibNext:modules:library。
+        // 写成 files(...) 会绕开替换、写成 project(...) 又跨不了 build——
+        // 两者都会让改动重新变成「手工拷贝 jar」的老问题。
+        //
+        // ⚠️ 已知限制：这条路上运行期会缺类（library 的普通 jar 里没有子模块的 mixin 实现）。
+        //
+        // 版本号必须与 KasugaLibNext/gradle.properties 的 mod_version 一致，否则替换规则不命中，
+        // 退化成去 maven 仓库找 lib.kasuga:kasuga-library:1.0.0 并失败。
+        //
+        // 注意 library 的 api 依赖会顺着这条线进入运行期 classpath（cc.tweaked / create /
+        // Ponder / Registrate / flywheel）。它们能解析，靠的是本文件顶部 repositories{}
+        // 里补的那三个仓库——删掉那三个仓库会立刻变成 "Could not find cc.tweaked:..."。
+        implementation "lib.kasuga:kasuga-library:1.0.0"
+    }
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata

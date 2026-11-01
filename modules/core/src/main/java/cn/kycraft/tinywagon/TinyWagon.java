@@ -1,6 +1,7 @@
 package cn.kycraft.tinywagon;
 
 //import cn.kycraft.tinywagon.items.BufferStop;
+import cn.kycraft.tinywagon.TinyWagonConfig;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;

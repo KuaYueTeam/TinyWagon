@@ -1,0 +1,24 @@
+// :modules:track —— 资源模块（原 modules/resources，提交 0138507 改名）。
+// 它本身没有 Java 代码，只把 src/resources 作为资源目录；
+// core 通过 sourceSets.main.resources.srcDir project(':modules:track')... 把资源并进主 jar。
+//
+// 之前这里整段被注释掉、且仍引用旧名字 :modules:resources，是
+// "Configuring project ':modules:resources' without an existing directory" 报错的来源。
+
+plugins {
+    id 'java-library'
+}
+
+version = mod_version
+group = mod_group_id
+base { archivesName = "${mod_id}-resources" }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+sourceSets {
+    main {
+        resources {
+            srcDir file('src/resources')
+        }
+    }
+}

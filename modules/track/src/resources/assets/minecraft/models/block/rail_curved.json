@@ -4,7 +4,7 @@
 	"mtl_override": "tiny_wagon:models/block/rail/rail_corner/rail_corner.mtl",
 	"textures": {
 		"texture0": "block/rail",
-		"particle": "tiny_wagon:block/rail/rail"
+		"particle": "minecraft:block/rail"
 	},
 	"automatic_culling": true,
 	"shade_quads": true,

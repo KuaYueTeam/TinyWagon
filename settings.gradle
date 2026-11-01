@@ -5,11 +5,63 @@ pluginManagement {
     }
 }
 
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
-}
+// 让 builder.kasuga.* 插件在**独立构建**下也能解析。
+//
+// KasugaLibNext/modules/gradle-plugin 本身就是一个 Gradle 插件工程（java-gradle-plugin），
+// 它注册了 builder.kasuga.monorepo / .generator / .shader / .resource-compiler。
+// 只有把它 includeBuild 进来，modules/core/build.gradle 的 plugins{} 块才有机会解析到这些 id。
+//
+// 注意：**光靠 includeBuild 还不能用 `apply plugin: 'xxx'`**。includeBuild 只把插件放进
+// pluginManagement 的候选里，`apply plugin:` 走的是 buildscript classpath，会报
+// "Plugin with id 'builder.kasuga.monorepo' not found"。必须写成 plugins { id '...' } 的形式。
+includeBuild '../KasugaLibNext/modules/gradle-plugin'
+
+// 依赖仓库不在这里声明！原因（实测得出，别踩回去）：
+//
+// 一旦在 settings.gradle 里写了 dependencyResolutionManagement{repositories{...}}，
+// moddev 2.0.107 的 ModDevPlugin.java:31-36 就会判定「仓库已在 settings 级应用」而**跳过**
+// 自带的 RepositoriesPlugin，于是丢掉两个 moddev 专用仓库：
+//   - https://maven.neoforged.net/mojang-meta/  ← 只在 PREFER_SETTINGS/repository 里能拿到
+//     net.neoforged:minecraft-dependencies 的 .module，缺了它直接报：
+//     Could not find net.neoforged:minecraft-dependencies:1.21.1.
+//     （我已验证该坐标在 maven.neoforged.net/releases 上是 404，只在 mojang-meta 提供服务）
+//   - https://libraries.minecraft.net/ 的 MojangRepositoryFilter 内容过滤
+// 另外 PREFER_SETTINGS 是"全集覆盖"，还会顺带挤掉 mavenCentral()，
+// 造成 zxing/guava/gson 这类公共库 "Could not find" 的假故障。
+//
+// 所以：NeoForge/Minecraft 那一套仓库交给 moddev 自己在 project 级装；
+// KasugaLibNext 传递依赖需要的那三个仓库单独加在 modules/core/build.gradle 的 repositories{} 里。
+
+// foojay toolchain 插件（缺 JDK 时自动下载）是可选的：本机已有 JDK 21 时不需要它。
+// 等能稳定访问 plugins.gradle.org 后再取消注释恢复。
+//plugins {
+//    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+//}
 
 // 保持与旧工程一致的根项目名：决定 IDEA 生成的模块名
 // 与运行配置前缀(TinyWagon: Client 等)。
 // 不影响 jar 名与 mod 元数据——那些由 build.gradle 的 archivesName = mod_id 与 gradle.properties 的 mod_id/mod_name 决定。
 rootProject.name = 'TinyWagon'
+
+include ':modules:core'
+// 资源模块已从 modules/resources 重命名为 modules/track（提交 0138507「模块化」）
+// 注意：core 通过 project(':modules:track') 引用它，两个名字必须一致，否则
+// 报 "Configuring project ':modules:resources' without an existing directory ..."。
+include ':modules:track'
+
+// KasugaLibNext 走 composite build（只用源码工程，不再依赖 libs/ 里手工拷贝的 jar）。
+//
+// 关键点：includeBuild 本身只接管「插件」和「任务」的解析，**不会**让字符坐标自动指向
+// 构建产物。必须显式写 dependencySubstitution，否则 dependencies 里写
+// "lib.kasuga:kasuga-library:1.0.0" 会退回到去 maven 仓库找、找不到就报 Could not resolve。
+//
+// 被替换的坐标来自 :modules:library 的 mavenJava publication：
+//   group   = lib.kasuga        (KasugaLibNext/gradle.properties 的 mod_group_id)
+//   name    = kasuga-library    (根 build.gradle 的 archivesName = "kasuga-${project.name}"，project.name = library)
+//   version = 1.0.0             (KasugaLibNext/gradle.properties 的 mod_version)
+// 任一处不匹配，Gradle 会静默地不去替换，表现就是「找不到依赖」，排查时先核对这三个值。
+includeBuild('../KasugaLibNext') {
+    dependencySubstitution {
+        substitute module('lib.kasuga:kasuga-library') using project(':modules:library')
+    }
+}
