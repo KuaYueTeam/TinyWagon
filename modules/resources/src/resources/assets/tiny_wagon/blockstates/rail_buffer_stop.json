@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "tiny_wagon:block/rail_buffer_stop" }
+  }
+}

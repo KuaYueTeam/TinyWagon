@@ -1,0 +1,6 @@
+# Made in Blockbench 5.2.2
+newmtl m_rail_buffer_stop
+map_Kd #texture0
+newmtl m_rail
+map_Kd #texture1
+newmtl none

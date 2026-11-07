@@ -1,7 +1,9 @@
 package cn.kycraft.tinywagon;
 
-//import cn.kycraft.tinywagon.items.BufferStop;
-import cn.kycraft.tinywagon.TinyWagonConfig;
+import cn.kycraft.tinywagon.block.RailBufferStopBlocks;
+import cn.kycraft.tinywagon.item.BufferStopItems;
+import cn.kycraft.tinywagon.registeries.TinyWagonRegistry;
+import cn.kycraft.tinywagon.tabs.TWTabs;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -17,31 +19,23 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
-// The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(TinyWagon.MODID)
 public class TinyWagon {
-    // Define mod id in a common place for everything to reference
+
     public static final String MODID = "tiny_wagon";
-    // Directly reference a slf4j logger
+
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    // The constructor for the mod class is the first code that is run when your mod is loaded.
-    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
+
     public TinyWagon(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
-//        cn.kycraft.tinywagon.items.BufferStop.register(modEventBus);
-//        NeoForge.EVENT_BUS.register(this);
-
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (TinyWagon) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
+        BufferStopItems.bootstrap();
+        RailBufferStopBlocks.bootstrop();
+        TinyWagonRegistry.COMMON.register(modEventBus);
+        TWTabs.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
 
-        // Register the item to a creative tab
-//        modEventBus.addListener(this::addCreative);
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, TinyWagonConfig.SPEC);
     }
 
@@ -58,17 +52,10 @@ public class TinyWagon {
         TinyWagonConfig.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
     }
 
-    // Add the example block item to the building blocks tab
-//    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-//        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-//            event.accept(EXAMPLE_BLOCK_ITEM);
-//        }
-//    }
-
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
+        LOGGER.info("");
     }
 }

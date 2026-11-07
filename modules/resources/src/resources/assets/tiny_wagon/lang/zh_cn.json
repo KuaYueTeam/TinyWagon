@@ -1,0 +1,13 @@
+{
+  "itemGroup.tiny_wagon_tab": "Tiny Wagon",
+  "item.tiny_wagon.buffer_stop": "车挡器",
+  "block.tiny_wagon.rail_buffer_stop": "车挡器",
+  "block.tiny_wagon.buffer_stop_block": "车挡器",
+  "tiny_wagon.configuration.title": "TinyWagon 配置",
+  "tiny_wagon.configuration.section.tiny_wagon.common.toml": "TinyWagon 通用配置",
+  "tiny_wagon.configuration.section.tiny_wagon.common.toml.title": "TinyWagon 通用配置",
+  "tiny_wagon.configuration.logDirtBlock": "输出泥土方块日志",
+  "tiny_wagon.configuration.magicNumber": "魔法数字",
+  "tiny_wagon.configuration.magicNumberIntroduction": "魔法数字文本",
+  "tiny_wagon.configuration.items": "物品列表"
+}

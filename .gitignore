@@ -73,3 +73,5 @@ debug.log
 
 src/generated/
 !**/src/generated/README.md
+
+doc/
